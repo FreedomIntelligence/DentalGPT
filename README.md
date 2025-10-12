@@ -112,4 +112,7 @@ We conduct the out-of-domain evaluation on [AlphaDent](https://www.kaggle.com/co
 We are from:
 - The Chinese University of Hong Kong, Shenzhen 香港中文大学（深圳）
 - Shenzhen Stomatology Hospital (Pingshan) of Southern Medical University 南方医科大学深圳口腔医院（坪山）
+- Faculty of Dentistry, The University of Hong Kong 港大学牙学院
 - Freedom AI 深圳自由动脉科技有限公司
+
+特别鸣谢智谱华章科技提供支持。
