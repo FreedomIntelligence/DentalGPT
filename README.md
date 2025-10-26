@@ -8,16 +8,14 @@
 
 <div align="center">
 <h4>
- 🤖 <a href="https://www.modelscope.cn/models/Eric3200C/DentalGPT-7B-Preview" target="_blank">Dental-7B-Preview</a>
+ 🤖 <a href="https://huggingface.co/Eric3200/DentalGPT-7B-1026" target="_blank">Dental-7B-1026</a>
 </h4>
 </div>
 
 ## ⚡ Introduction
-Hello! Welcome to the repository for DentalGPT (齿问大模型)!
+Hello! Welcome to the repository for DentalGPT (齿问大模型)! You can access DentalGPT-7B-1026 on [HF space](https://huggingface.co/spaces/Eric3200/DentalGPT).
 
-**DentalGPT** is a specialized medical LLM for intraoral photograph analysis. Through a customized curriculum learning design and DAPO training, we utilized **1,585 annotated intraoral photographs** to enhance the performance of Qwen2.5-VL-7B-Instruct in this specific domain, achieving a level comparable to models such as GPT-4o, GPT-5, and Gemini2.5-Pro.
-
-> *⚠️ DentalGPT-7B-Preview is an early-stage model for investigating training approaches. It is not equipped with professional diagnostic competence, and any clinical application is strictly discouraged.* 
+**DentalGPT** is a specialized medical LLM for dental image analysis. Through a customized pretraining and SFT, we utilized **more than 100,000 dental images** to enhance the performance of Qwen2.5-VL-7B-Instruct in this specific domain, achieving a level comparable to models such as Claude-Sonnet-4.5-Thinking, GPT-5, and Gemini2.5-Pro.
 
 ## 👨‍⚕️ Model
 
@@ -27,10 +25,9 @@ Hello! Welcome to the repository for DentalGPT (齿问大模型)!
 
 |                        | Parameters |  Link                                                                  |
 | ---------------------- | ---------- | --------------------------------------------------------------------- |
-| **DentalGPT-7B-Preview**  | 7B         | [ModelScope Link](https://www.modelscope.cn/models/Eric3200C/DentalGPT-7B-Preview) |
-| **DentalGPT-9B** | 9B       |  Available soon  |
+| **DentalGPT-7B-1026**  | 7B         | [Huggingface Link](https://huggingface.co/Eric3200/DentalGPT-7B-1026) |
 
-*Note: DentalGPT-7B-Preview is based on Qwen2.5-VL-7B-Instruct.*
+*Note: DentalGPT-7B-1026 is based on Qwen2.5-VL-7B-Instruct.*
 
 #### Model Inference
 
@@ -52,7 +49,7 @@ messages = [
                 "type": "image",
                 "image": "/path/to/your/image.png",
             },
-            {"type": "text", "text": "请帮我分析这张患者的口内拍摄图片。"},
+            {"type": "text", "text": "Please analyze this image."},
         ],
     }
 ]
@@ -84,27 +81,55 @@ print(output_text)
 
 ## 🧐 Evaluation
 
+<details close>
+<summary><h4>Evaluation Settings</h></summary>
+
+#### Evaluation Data Collection
+To evaluate the capability of multimodal large language models (MLLMs) in understanding dental images, we curated a specialized evaluation dataset sourced from hospital and internet data.
+
+The dataset is composed of three subsets:
+1. **Pingshan-Intraoral-Clinical**
+- A collection of intraoral photographs from the [AlphaDent](https://www.kaggle.com/competitions/alpha-dent) dataset, captured by licensed dentists from a clinical perspective under standardized lighting and imaging conditions.
+- These images provide high-quality professional references of oral health conditions.
+- Included labels: *Tooth discoloration, Abnormal gingival coloration, Gingival recession, Dental caries, Tooth pigmentation, Tooth defect or loss, Tooth loss, Dental calculus, Abnormal tooth morphology, Abnormal gingival morphology.*
+2. **Pingshan-Intraoral-Internet**
+- A set of intraoral images collected from the internet based on dental-related keywords.
+– The images feature diverse lighting and shooting angles, simulating photos that patients might take themselves.
+- Included labels: *Tooth pigmentation, Abnormal gingival coloration, Dental calculus, Tooth loss, Dental caries, Abnormal gingival morphology, Gingival recession.*
+3. **Pingshan-Panorama**
+- A dataset of panoramic dental radiographs (X-rays) provided by Shenzhen Stomatology Hospital (Pingshan) of Southern Medical University, containing real patient panoramic imaging data.
+- Included labels: *Periodontal disease, Root canal treatment, Tooth defect or loss, Jawbone lesion, Periapical lesion, Impacted tooth.*
+Together, these subsets cover both clinical and in-the-wild dental imaging conditions, ensuring a comprehensive evaluation of the models’ visual diagnostic abilities.
+
+#### Annotation and Filtering
+All images were **annotated by professional dentists** from Shenzhen Stomatology Hospital (Pingshan) of Southern Medical University.
+
+To ensure high data reliability, only samples with an **inter-annotator agreement above 90% were retained for evaluation**.
+
+Additionally, **all labels were balanced** between positive and negative samples to ensure fairness across categories.
+This enables direct comparison of model accuracy across different disease types.
+
+#### Evaluation Protocol
+Each evaluated MLLM was required to determine whether a given image indicates the presence (“Yes”) or absence (“No”) of a specific dental condition.
+
+The model’s final output must be strictly binary (“Yes” or “No”), without providing explanations. (Note: Reasoning-enabled models may internally generate their chain of thought.)
+</details>
 <details open>
-<summary><h4>Out-of-domain Evaluation on 18 oral disease lables</h4></summary>
-
-In this study, we trained DentalGPT-preview on web-crawled dental images, each carefully annotated by experienced dental professionals into 18 categories.
-
-We conduct the out-of-domain evaluation on [AlphaDent](https://www.kaggle.com/competitions/alpha-dent) dataset's test set, which was annotated with the same 18 categories by doctors, ensuring label consistency to reliably evaluate the model’s generalization across different data sources.
-
-|      | Macro F1 | Micro F1 | Macro AUC | Micro AUC | Jaccard Index |
-| ----- | ----- | ----- | ----- | ----- | ----- |
-| Gemini-2.5-Pro | 42.61 | 42.86 | 56.62 | 55.85 | 47.68 |
-| Doubao-1.5-Vision-Pro | 32.80 | 41.33 | 59.83 | 61.10 | 60.55 |
-| GPT-4o | 41.16 | 45.03 | 59.67 | 60.55 | 60.75 |
-| GPT-5 | **45.58** | 46.89 | 60.44 | 62.28 | 62.25 |
-| Qwen2.5-VL-7B-Instruct | 33.16 | 39.28 | 53.57 | 55.50 | 56.80 |
-| DentalGPT-7B-Preview | 43.75 | **47.98** | **63.98** | **63.67** | **64.13** |
+<summary><h4>Evaluation Results</h4></summary>
+  
+|      | Pingshan-Intraoral-Clinical | Pingshan-Intraoral-Internet | Pingshan-Panorama | Average |
+| ----- | ----- | ----- | ----- | ----- |
+| Claude-Sonnet-4.5-Thinking | 55.2 | 66.7 | 55.8 | 59.2 |
+| Qwen3-VL-235B-A22B-Thinking | 56.7 | 65.7 | 55.8 | 59.4 |
+| Gemini-2.5-Pro | 57.0 | 65.2 | 63.5 | 61.9 |
+| GPT-5 | 59.3 | 71.0 | 63.5 | 64.6 |
+| Qwen2.5-VL-7B-Instruct | 54.8 | 61.8 | 50.0 | 55.5 |
+| **DentalGPT-7B-1026** | **63.2** | **75.8** | **80.1** | **73.0** |
 </details>
 
 ## 🎯 To-Do
 - [x] Commit the preview version of DentalGPT
-- [x] Upload the technical report
-- [ ] Open-source the training code
+- [ ] Upload the technical report
 - [ ] Propose the paper
 - [ ] Release the professional version of DentalGPT
 
