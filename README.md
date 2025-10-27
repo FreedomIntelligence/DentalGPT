@@ -38,8 +38,8 @@ Hello! Welcome to the repository for DentalGPT (齿问大模型)! You can access
 from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
 from qwen_vl_utils import process_vision_info
 
-processor = AutoProcessor.from_pretrained("FreedomIntelligence/DentalGPT-7B-Preview")
-model = Qwen2_5_VLForConditionalGeneration.from_pretrained("FreedomIntelligence/DentalGPT-7B-Preview", torch_dtype="auto", device_map="auto")
+processor = AutoProcessor.from_pretrained("Eric3200/DentalGPT-7B-1026")
+model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Eric3200/DentalGPT-7B-1026", torch_dtype="auto", device_map="auto")
 
 messages = [
     {
@@ -88,15 +88,15 @@ print(output_text)
 To evaluate the capability of multimodal large language models (MLLMs) in understanding dental images, we curated a specialized evaluation dataset sourced from hospital and internet data.
 
 The dataset is composed of three subsets:
-1. **Pingshan-Intraoral-Clinical**
+1. **Intraoral-Classification-I-270**
 - A collection of intraoral photographs from the [AlphaDent](https://www.kaggle.com/competitions/alpha-dent) dataset, captured by licensed dentists from a clinical perspective under standardized lighting and imaging conditions.
 - These images provide high-quality professional references of oral health conditions.
 - Included labels: *Tooth discoloration, Abnormal gingival coloration, Gingival recession, Dental caries, Tooth pigmentation, Tooth defect or loss, Tooth loss, Dental calculus, Abnormal tooth morphology, Abnormal gingival morphology.*
-2. **Pingshan-Intraoral-Internet**
+2. **Intraoral-Classification-II-207**
 - A set of intraoral images collected from the internet based on dental-related keywords.
 – The images feature diverse lighting and shooting angles, simulating photos that patients might take themselves.
 - Included labels: *Tooth pigmentation, Abnormal gingival coloration, Dental calculus, Tooth loss, Dental caries, Abnormal gingival morphology, Gingival recession.*
-3. **Pingshan-Panorama**
+3. **Panorama-Classification-156**
 - A dataset of panoramic dental radiographs (X-rays) provided by Shenzhen Stomatology Hospital (Pingshan) of Southern Medical University, containing real patient panoramic imaging data.
 - Included labels: *Periodontal disease, Root canal treatment, Tooth defect or loss, Jawbone lesion, Periapical lesion, Impacted tooth.*
 Together, these subsets cover both clinical and in-the-wild dental imaging conditions, ensuring a comprehensive evaluation of the models’ visual diagnostic abilities.
@@ -117,7 +117,7 @@ The model’s final output must be strictly binary (“Yes” or “No”), with
 <details open>
 <summary><h4>Evaluation Results</h4></summary>
   
-|      | Pingshan-Intraoral-Clinical | Pingshan-Intraoral-Internet | Pingshan-Panorama | Average |
+|      | Intraoral-Classification-I-270 | Intraoral-Classification-II-207 | Panorama-Classification-156 | Average |
 | ----- | ----- | ----- | ----- | ----- |
 | Claude-Sonnet-4.5-Thinking | 55.2 | 66.7 | 55.8 | 59.2 |
 | Qwen3-VL-235B-A22B-Thinking | 56.7 | 65.7 | 55.8 | 59.4 |
@@ -125,6 +125,8 @@ The model’s final output must be strictly binary (“Yes” or “No”), with
 | GPT-5 | 59.3 | 71.0 | 63.5 | 64.6 |
 | Qwen2.5-VL-7B-Instruct | 54.8 | 61.8 | 50.0 | 55.5 |
 | **DentalGPT-7B-1026** | **63.2** | **75.8** | **80.1** | **73.0** |
+
+> 'Intraoral' denotes intraoral photographs, while 'Panorama' denotes panoramic radiographs. All images were annotated by licensed dentists.
 </details>
 
 ## 🎯 To-Do
