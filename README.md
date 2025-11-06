@@ -134,6 +134,7 @@ The model’s final output must be strictly binary (“Yes” or “No”), with
 - [ ] Upload the technical report
 - [ ] Propose the paper
 - [ ] Release the professional version of DentalGPT
+- [ ] Upload training dataset
 
 ##  📖 About Us
 We are from:
