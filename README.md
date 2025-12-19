@@ -1,4 +1,4 @@
-# 齿问大模型 DentalGPT
+# DentalGPT: Incentivizing Multimodal Complex Reasoning in Dentistry
 
 <div align="center">
 <h3>
@@ -6,78 +6,34 @@
 </h3>
 </div>
 
-<div align="center">
-<h4>
- 🤖 <a href="https://huggingface.co/Eric3200/DentalGPT-7B-1026" target="_blank">Dental-7B-1026</a>
-</h4>
-</div>
-
 ## ⚡ Introduction
-Hello! Welcome to the repository for DentalGPT (齿问大模型)! You can access DentalGPT-7B-1026 on [HF space](https://huggingface.co/spaces/Eric3200/DentalGPT).
+Hello! Welcome to the repository for DentalGPT! **DentalGPT** is the first specialized dental Multimodal Large Language Model (MLLM) equipped with **advanced complex reasoning capabilities**. While general MLLMs struggle to capture fine-grained dental visual details, DentalGPT leverages high-quality domain knowledge injection and reinforcement learning to interpret complex reasoning in dentistry.
 
-**DentalGPT** is a specialized medical LLM for dental image analysis. Through a customized pretraining and SFT, we utilized **more than 100,000 dental images** to enhance the performance of Qwen2.5-VL-7B-Instruct in this specific domain, achieving a level comparable to models such as Claude-Sonnet-4.5-Thinking, GPT-5, and Gemini2.5-Pro.
+Despite its compact **7B parameter** scale, DentalGPT achieves superior performance in disease classification and dental VQA tasks, outperforming many state-of-the-art models with over 100B parameters (such as GPT-5 and Gemini-2.5-Pro).
 
-## 👨‍⚕️ Model
+### Key Contributions:
+* **Massive Scale**: Constructed the largest annotated dental multimodal dataset to date with **over 120k dental images**.
+* **2-Stage Training**: A novel pipeline involving **Multimodal Understanding Enhancement** and **Reinforcement Learning (RL)**.
+* **Advanced Reasoning**: Integration of the **Group Relative Policy Optimization (GRPO)** algorithm to incentivize long chain-of-thought (CoT) reasoning for precise diagnosis in dentistry.
 
-#### Model Access
+## 👨‍⚕️ Model Training Pipeline
 
-> **DentalGPT-7B-Preview** is available on Huggingface:
+**DentalGPT** is developed on top of the **Qwen2.5-VL-7B-Instruct** backbone through a structured 2-stage process:
 
-|                        | Parameters |  Link                                                                  |
-| ---------------------- | ---------- | --------------------------------------------------------------------- |
-| **DentalGPT-7B-1026**  | 7B         | [Huggingface Link](https://huggingface.co/Eric3200/DentalGPT-7B-1026) |
+### Stage I: Multimodal Understanding Enhancement
+This stage focuses on injecting high-quality dental domain knowledge:
+* **Image Captioning**: Alignment of visual features with professional dental terminology.
+* **Instruction Tuning**: Enhancing performance on downstream tasks through expert-verified QA pairs.
+* **Knowledge Density**: Training on data with higher knowledge density and professional quality compared to standard GPT-distilled datasets.
 
-*Note: DentalGPT-7B-1026 is based on Qwen2.5-VL-7B-Instruct.*
+### Stage II: Reinforcement Learning for Complex Reasoning
+We apply the **Group Relative Policy Optimization (GRPO)** algorithm to strengthen diagnostic logic:
+* **Thinking Mode**: The model is trained to use `<think>` tags for internal reasoning and reflection before providing a final `<answer>`.
+* **Iterative Refinement**: Encourages the model to self-correct intermediate counting or identification errors, leading to higher accuracy in complex dental tasks.
 
-#### Model Inference
-
-<details open>
-<summary><h4>Inference with DentalGPT</h4></summary>
-
-```python
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
-from qwen_vl_utils import process_vision_info
-
-processor = AutoProcessor.from_pretrained("Eric3200/DentalGPT-7B-1026")
-model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Eric3200/DentalGPT-7B-1026", torch_dtype="auto", device_map="auto")
-
-messages = [
-    {
-        "role": "user",
-        "content": [
-            {
-                "type": "image",
-                "image": "/path/to/your/image.png",
-            },
-            {"type": "text", "text": "Please analyze this image."},
-        ],
-    }
-]
-
-text = processor.apply_chat_template(
-    messages, tokenize=False, add_generation_prompt=True
-)
-image_inputs, video_inputs = process_vision_info(messages)
-inputs = processor(
-    text=[text],
-    images=image_inputs,
-    videos=video_inputs,
-    padding=True,
-    return_tensors="pt",
-)
-inputs = inputs.to("cuda")
-
-# Inference: Generation of the output
-generated_ids = model.generate(**inputs, max_new_tokens=128)
-generated_ids_trimmed = [
-    out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-]
-output_text = processor.batch_decode(
-    generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-)
-print(output_text)
-```
-</details>
+<div align=center>
+<img src="images/trainingpipeline.png"  width = "100%" alt="The 2-stage process of building DentalGPT." align=center/>
+</div>
 
 ## 🧐 Evaluation
 
@@ -87,54 +43,33 @@ print(output_text)
 #### Evaluation Data Collection
 To evaluate the capability of multimodal large language models (MLLMs) in understanding dental images, we curated a specialized evaluation dataset sourced from hospital and internet data.
 
-The dataset is composed of three subsets:
-1. **Intraoral-Classification-I-270**
+To ensure clinical reliability, we evaluated the model on five specialized datasets:
+1.  **MMOral-OPG-Bench**: A benchmark assessing panoramic X-ray understanding across five clinically grounded dimensions.
+2.  **DentalBench-Mixed**: A targeted dataset formed by filtering tooth-related images from widely used medical VQA benchmarks (PMC-VQA, OmniMedVQA, MedXpertQA-MM).
+3. **Intraoral-Classification-I**
 - A collection of intraoral photographs from the [AlphaDent](https://www.kaggle.com/competitions/alpha-dent) dataset, captured by licensed dentists from a clinical perspective under standardized lighting and imaging conditions.
 - These images provide high-quality professional references of oral health conditions.
 - Included labels: *Tooth discoloration, Abnormal gingival coloration, Gingival recession, Dental caries, Tooth pigmentation, Tooth defect or loss, Tooth loss, Dental calculus, Abnormal tooth morphology, Abnormal gingival morphology.*
-2. **Intraoral-Classification-II-207**
+4. **Intraoral-Classification-II**
 - A set of intraoral images collected from the internet based on dental-related keywords.
 – The images feature diverse lighting and shooting angles, simulating photos that patients might take themselves.
 - Included labels: *Tooth pigmentation, Abnormal gingival coloration, Dental calculus, Tooth loss, Dental caries, Abnormal gingival morphology, Gingival recession.*
-3. **Panorama-Classification-156**
+5. **Panorama-Classification**
 - A dataset of panoramic dental radiographs (X-rays) provided by Shenzhen Stomatology Hospital (Pingshan) of Southern Medical University, containing real patient panoramic imaging data.
 - Included labels: *Periodontal disease, Root canal treatment, Tooth defect or loss, Jawbone lesion, Periapical lesion, Impacted tooth.*
 Together, these subsets cover both clinical and in-the-wild dental imaging conditions, ensuring a comprehensive evaluation of the models’ visual diagnostic abilities.
-
-#### Annotation and Filtering
-All images were **annotated by professional dentists** from Shenzhen Stomatology Hospital (Pingshan) of Southern Medical University.
-
-To ensure high data reliability, only samples with an **inter-annotator agreement above 90% were retained for evaluation**.
-
-Additionally, **all labels were balanced** between positive and negative samples to ensure fairness across categories.
-This enables direct comparison of model accuracy across different disease types.
-
-#### Evaluation Protocol
-Each evaluated MLLM was required to determine whether a given image indicates the presence (“Yes”) or absence (“No”) of a specific dental condition.
-
-The model’s final output must be strictly binary (“Yes” or “No”), without providing explanations. (Note: Reasoning-enabled models may internally generate their chain of thought.)
-</details>
-<details open>
-<summary><h4>Evaluation Results</h4></summary>
-  
-|      | Intraoral-Classification-I-270 | Intraoral-Classification-II-207 | Panorama-Classification-156 | Average |
-| ----- | ----- | ----- | ----- | ----- |
-| Claude-Sonnet-4.5-Thinking | 55.2 | 66.7 | 55.8 | 59.2 |
-| Qwen3-VL-235B-A22B-Thinking | 56.7 | 65.7 | 55.8 | 59.4 |
-| Gemini-2.5-Pro | 57.0 | 65.2 | 63.5 | 61.9 |
-| GPT-5 | 59.3 | 71.0 | 63.5 | 64.6 |
-| Qwen2.5-VL-7B-Instruct | 54.8 | 61.8 | 50.0 | 55.5 |
-| **DentalGPT-7B-1026** | **63.2** | **75.8** | **80.1** | **73.0** |
-
-> 'Intraoral' denotes intraoral photographs, while 'Panorama' denotes panoramic radiographs. All images were annotated by licensed dentists.
 </details>
 
-## 🎯 To-Do
-- [x] Commit the preview version of DentalGPT
-- [ ] Upload the technical report
-- [ ] Propose the paper
-- [ ] Release the professional version of DentalGPT
-- [ ] Upload training dataset
+#### Evaluation Results
+
+<div align=center>
+<img src="images/results.png"  width = "100%" alt="The 2-stage process of building DentalGPT." align=center/>
+</div>
+
+DentalGPT demonstrates superior performance across all evaluated benchmarks, establishing it as a leading multimodal foundation model for dental image understanding.
+
+1. **Expert-Level Performance with 7B Efficiency**: Despite its compact size, DentalGPT consistently outperforms general-purpose models with over larger parameters (such as GPT-5 and Gemini-2.5-Pro) in dental-specific tasks. This highlights the effectiveness of domain-specialized training.
+2. **Robust Generalization**: The model achieves significant gains across diverse modalities, including professional panoramic X-rays and "in-the-wild" intraoral photos taken by patients. It shows a massive improvement over its backbone model, particularly in identifying complex conditions like periapical lesions and impacted teeth.
 
 ##  📖 About Us
 We are from:
@@ -144,3 +79,13 @@ We are from:
 - Freedom AI 深圳自由动脉科技有限公司
 
 特别鸣谢智谱华章科技提供支持。
+
+## 📖 Citation
+```
+@article{cai2025dentalgpt,
+  title={DentalGPT: Incentivizing Multimodal Complex Reasoning in Dentistry},
+  author={Cai, Zhenyang and Zhang, Jiaming and Zhao, Junjie and Zeng, Ziyi and Li, Yanchao and Liang, Jingyi and Chen, Junying and Yang, Yunjin and You, Jiajun and Deng, Shuzhi and Wang, Tongfei and Chen, Wanting and Hao, Chunxiu and Xie, Ruiqi and Wen, Zhenwei and Feng, Xiangyi and Ting, Zou and Lin, Jin Zou and Li, Jianquan and Yu, Guangjun and Chen, Liangyi and Wang, Junwen and Jiang, Shan and Wang, Benyou},
+  journal={arXiv preprint arXiv:2512.11558},
+  year={2025}
+}
+```
