@@ -82,10 +82,11 @@ We are from:
 
 ## 📖 Citation
 ```
-@article{cai2025dentalgpt,
-  title={DentalGPT: Incentivizing Multimodal Complex Reasoning in Dentistry},
-  author={Cai, Zhenyang and Zhang, Jiaming and Zhao, Junjie and Zeng, Ziyi and Li, Yanchao and Liang, Jingyi and Chen, Junying and Yang, Yunjin and You, Jiajun and Deng, Shuzhi and Wang, Tongfei and Chen, Wanting and Hao, Chunxiu and Xie, Ruiqi and Wen, Zhenwei and Feng, Xiangyi and Ting, Zou and Lin, Jin Zou and Li, Jianquan and Yu, Guangjun and Chen, Liangyi and Wang, Junwen and Jiang, Shan and Wang, Benyou},
-  journal={arXiv preprint arXiv:2512.11558},
-  year={2025}
+@inproceedings{cai2026dentalgpt,
+  title={DentalGPT: Incentivizing Multimodal Reasoning in Dentistry},
+  author={Cai, Zhenyang and Zhang, Jiaming and Zhao, Junjie and Zeng, Ziyi and Li, Yanchao and Jingyi, Liang and Chen, Junying and Yang, Yunjin and You, Jiajun and Deng, Shuzhi and others},
+  booktitle={Findings of the Association for Computational Linguistics: ACL 2026},
+  pages={2811--2829},
+  year={2026}
 }
 ```
